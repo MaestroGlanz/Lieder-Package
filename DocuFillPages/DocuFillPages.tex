@@ -1,0 +1,51 @@
+\documentclass[11pt,a4paper]{scrartcl}
+\usepackage[utf8]{inputenc}
+\usepackage[english]{babel}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+\usepackage{graphicx}
+\usepackage{listings}
+
+\makeatletter
+\def\FillPages{\makebox{\vspace*{50pt} \includegraphics[height=\f@size pt]{./GFM-FP-Logo}} }
+\def\FillPagesTiny{\includegraphics[height=\f@size pt]{./GFM-FP-LogoTiny}\hspace*{-3pt}}
+\def\FillPagesS{\hspace*{3pt}\includegraphics[height=\f@size pt]{./GFM-FP-LogoS}\hspace*{3pt}}
+\makeatother
+\title{Fill\FillPagesS Pages\FillPagesS Package}
+\author{Gabriel Ruprecht}
+
+
+\begin{document}
+\maketitle
+\section{Introduction}
+\subsection{About}
+The \textsf{Fill\FillPagesS Pages\FillPagesS Package} can be used, if you create a book, booklet or similar. If you print such things, you normally need a final page number, which can be divided by 4, 8 or 16. This package fills your document with the needed pages. By default, they are blank, but they may also have a pre-defined content. If you use this package, you have to compile at least two times. The first run counts the pages and inserting positions. This information is used in the second run, to calculate the number of pages to be inserted. 
+\subsection{License}
+You may do whatever you want with the package as long as there will not appear a similar package (deriving from this one) on CTAN.  If you change the package and redistribute it, please keep the credits.
+\section{References and Interferences}
+To avoid any interference with other packages, I listed the most probable causes for interference.
+
+This package uses \verb-xparse-. Make sure there is no interference. For future developments there might be also use of the \verb-etoolbox-. The package writes the following lines to the aux-file:\begin{verbatim}
+\global\GFM@FiPa@totalpages= <number of pages to be inserted>
+\global\GFM@FiPa@AnzahlAusgleichsSeiten= <number of inserted pages>
+\global\GFM@FiPa@AnzahlAusgleichspositionen= <number of inserting points>
+\end{verbatim}
+\noindent Make sure, that they don't interfere with anything of other packages or with any of your counters.
+\section{Commands}
+\noindent\verb&\insertFillPages&\\ This command must be placed at the points, where insertion is allowed (insertion points). This can be done at multiple points. The total number of pages to be inserted is divided by the number of insertion points. If there are three insertion points and five pages will be inserted, the insertion will be \verb#2 2 1#.\bigskip
+
+\noindent\verb&\pagesDividableBy{number}[offset]&\\ This defines the number the page number must be dividable by (default~=~4). If \verb+number+ is 4 and page count is 13, 3 pages will be inserted~(4*4=16; 13+3=16). If \verb+number+ is~4 and \verb+offset+ is 2, the same example will lead to 1 inserted page (3*4=12; 12+2=14; 13+1=14).\bigskip
+
+\noindent\verb&\setFillPage{pagenumber}{content}&\\
+This creates a custom page, which will be used, if needed. I.e. \verb&\setFillPage{3}{This is the insert page three}& will create a page with the text ''This is the insert page three''. If only 2 pages are needed, it won't be used. If more than 2, it will be used.\bigskip
+
+
+\section{Revision History}
+\noindent
+\begin{tabular}{l l}
+12 of June 2016:& v0.1
+\end{tabular}
+
+
+\end{document}

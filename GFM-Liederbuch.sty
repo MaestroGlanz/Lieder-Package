@@ -1,0 +1,490 @@
+\ProvidesPackage{GFM-Liederbuch}
+\RequirePackage{etoolbox}
+\RequirePackage{environ}
+\RequirePackage{xparse}
+\RequirePackage{pgfmath}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%Variablen
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%\ifdim\GFM@tempLengI\undefined\newdimen\GFM@LiBu@tempLengI\fi
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%Konstanten
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+\def\LBliederbuchStandard{n}
+\long\def\GFM@LB@Head{\spaceVorHead\mbox{}\print{title} \ \newline \print{composer}\spaceNachHead }%Standardwerte
+\long\def\GFM@LB@Foot{\spaceVorFoot\mbox{}\print{source} \hfill \print{date}\spaceNachFoot}%Standardwerte
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%Musikalische Sonderzeichen
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\newcommand{\whzl}{\raisebox{-1mm}{\hspace{0.3mm}\rule{0.3mm}{4mm}\hspace{0.3mm}\rule{0.1mm}{4mm}\hspace{0.2mm}}:}
+\newcommand{\whzr}{:\raisebox{-1mm}{\hspace{0.2mm}\rule{0.1mm}{4mm}\hspace{0.3mm}\rule{0.3mm}{4mm}}} 
+
+%\newcommand{\whzl}{
+%\GFM@LiBu@tempLengI=
+%\raisebox{-1mm}{\hspace{0.3mm}\rule{0.3mm}{4mm}\hspace{0.3mm}\rule{0.1mm}{4mm}\hspace{0.2mm}}:}
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%Verarbeitung der Meta-Daten
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+%parse meta data
+%entpackt eine Liste von Daten in der Form [erstes=xy & zweites = xz& drittes= irgend3wie]
+%Dies erzeugt die macros \erstes{xy} \zweites{xz} ...
+\NewDocumentCommand{\unpackage}{m}{
+	%stared command generates the commands global and guaranties no side effects
+	\@ifundefined{inputList}{
+		\DeclareListParser{\inputList}{&}
+	}{}%
+	%
+	%
+	%
+	{
+	\newcount\ipp
+	\ipp=0
+	\renewcommand{\do}[1]{
+		\csdef{tempList\the\ipp}{##1&}
+		\global\advance\ipp by1
+	}
+	\inputList{#1}
+	\def\choppyA##1=##2&{##1}
+	\def\choppyB##1=##2&{##2}
+	\newif\iflooping
+	\loopingtrue
+	\ipp=0
+	\loop
+		\ifnum\ipp>1000
+			\loopingfalse
+			\wlog{Error: Too much Meta-Data (>1000 Elements)}
+		\fi		
+		\expandafter\ifx\csname tempList\the\ipp\endcsname\relax
+			\loopingfalse
+		\else
+			\edef\temp{\csuse{tempList\the\ipp}}
+			\edef\tempA{\expandafter\choppyA\temp}
+			\edef\tempB{\expandafter\choppyB\temp}
+			\trim@spaces@in{\tempA}
+			\trim@spaces@in{\tempB}
+			%
+			%Most important line is here:
+			%
+			\global\csedef{GFM@LB@lied@\liederbuchtmp @\liederbuchtmpII @\liederbuchtmpIII @\tempA}{\expandafter\noexpand\tempB}%Liederbuch@Liedvariante@Liednummer
+%			\expandafter\show\csname GFM@LB@lied@\liederbuchtmp @\liederbuchtmpII @\liederbuchtmpIII @\tempA\endcsname
+			\advance\ipp by1
+			\fi
+	\iflooping\repeat
+	}
+}
+
+
+%erlaubt es, die Metadaten eines Stücks zu ergänzen oder ändern
+\def\tweakMetadata#1#2#3#4{{%Aufbau analog zum Befehl \LBsong
+	\def\liederbuchtmp{#2}%Liederbuch
+	\def\liederbuchtmpII{#1}%Liedvariante
+	\def\liederbuchtmpIII{#3}%Liednummer
+	\unpackage{#4}%
+}}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%Umgebungen und Befehle für Noten+Text in nativer Latexschrift
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\newdimen\NTtempDimA
+\newdimen\NTtempDimB
+\newdimen\NTtempDimC
+
+
+\newcommand{\notentext}[1]{%
+	\vskip 0pt%backwards compability
+	\nopagebreak[4]%
+	{% make commands local
+		\nopagebreak[4]%
+		\NTtempDimA=0pt%	
+		\noindent%
+		%Wird keine Einheit übergeben (z.B. [10] statt [10pt], bezieht sich das immer auf Prozent Zeilenbreite ([10] = 0.1\linewidth)
+		\DeclareDocumentCommand{\nspace}{s m}{%
+			\pgfmathparse{##2}%
+			\ifpgfmathunitsdeclared%
+				\ifx##1\BooleanTrue%
+					\hspace*{##2}%
+				\else%
+					\hspace{##2}%
+				\fi%
+			\else%
+				\NTtempDimC=0.01\linewidth\relax
+				\ifx##1\BooleanTrue%
+					\hspace*{##2\NTtempDimC}%
+				\else%
+					\hspace{##2\NTtempDimC}%
+				\fi%
+			\fi%
+		}%
+		\DeclareDocumentCommand{\ns}{s O{0 pt}}{%
+			\pgfmathparse{##2}%
+			\ifpgfmathunitsdeclared%
+				\NTtempDimB=\dimexpr##2\relax%
+			\else%
+				\NTtempDimB=##2\linewidth\relax%
+				\divide\NTtempDimB by 100\relax%
+			\fi%
+			\ifx##1\BooleanTrue%
+			{%
+				\divide\NTtempDimA by2\relax%
+				\divide\NTtempDimB by2\relax%
+				\hskip 0pt plus 1fill minus 1fill\relax%
+				\hspace{\dimexpr\NTtempDimB - \NTtempDimA}%
+				-%
+				\hspace{\dimexpr\NTtempDimB - \NTtempDimA}%
+				\hskip 0pt plus 1fill minus 1fill\relax%
+			}%
+			\else%
+				\hspace*{0.5\dimexpr\f@size pt}%compensates the - in ns* (not totally)
+				\hskip 0pt plus 2fill minus 2fill%
+				\hspace{\dimexpr\NTtempDimB - \NTtempDimA}%
+			\fi%
+			\global\NTtempDimA=\dimexpr\NTtempDimB\relax%
+		}%\ns
+		%%%%%%%%%% wichtigste Zeile ist hier:
+		\spaceVorNotentext%
+		\makebox[\textwidth]{%
+		\NTtempDimC=\dimexpr\f@size pt\relax%
+%		\parbox[t][0.5\NTtempDimC]{0pt}{}%	orig. statt 0.5 war 1.65
+		#1}%
+		\spaceNachNotentext%
+		%%%%%%%%%% wichtigste Zeile ENDE
+		\NTtempDimA=0pt%reset to avoid sideeffects otherwhere.
+		\pagebreak[3]%
+	}% make commands local
+	\pagebreak[3]%	
+	\vskip 0pt\relax%
+}%
+
+\newdimen\tempdimA
+
+\NewDocumentCommand\notenzeile{O{\linewidth} m m O{\empty} O{\empty} O{\empty} O{\empty} O{\empty}}{%
+	{%
+		\def\strophenNummernStyle##1{%
+			\setcounter{GFM@strophen@counter}{##1}%
+			\csuse{\GFM@strophen@Style}{GFM@strophen@counter}%
+		}%
+		%Multilines
+		\NewDocumentCommand{\multiline}{m m m O{\empty} O{\empty} O{\empty} O{\empty}}{
+			\parbox[c]{##1}{%
+				\newdimen\temp
+				\temp=\dimexpr\f@size pt%				
+				\vskip 0.27\temp%
+				\makebox[\linewidth]{##2}\\%
+				\makebox[\linewidth]{##3}%
+				\ifx##4\empty%
+				\else%
+					\\\makebox[\linewidth]{##4}%
+				\fi%
+				\ifx##5\empty%
+				\else%
+					\\\makebox[\linewidth]{##5}%
+				\fi%
+				\ifx##6\empty%
+				\else%
+					\\\makebox[\linewidth]{##6}%
+				\fi%
+				\ifx##7\empty%
+				\else%
+					\\\makebox[\linewidth]{##7}%
+				\fi%
+				\vskip 0.43\temp%%
+			}%
+		}
+		%
+		\noindent%
+		\begin{minipage}{#1}%
+			\relax%
+			\spaceVorNoten%
+			\makebox[\linewidth]{#2}%
+			\relax\mbox{}\spaceNachNoten%
+			\notentext{#3}%
+			\ifx#4\empty
+			\else
+				\notentext{#4}%
+			\fi
+			\ifx#5\empty
+			\else
+				\notentext{#5}%
+			\fi
+			\ifx#6\empty
+			\else
+				\notentext{#6}%
+			\fi
+			\ifx#7\empty
+			\else
+				\notentext{#7}%
+			\fi
+			\ifx#8\empty
+			\else
+				\notentext{#8}%
+			\fi
+		\end{minipage}\vskip0pt%
+	}%
+}
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%Umgebung für Strophen.
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+%%%Steuerung des Seitenumbruchs in Strophen
+\newcount\ali
+\newlength{\tempB}
+
+\def\setStrophenStyle#1{\def\GFM@strophen@Style{#1}}
+\setStrophenStyle{arabic}
+
+\newcounter{GFM@strophen@counter}
+\setcounter{GFM@strophen@counter}{-1}
+
+%automatische Strophennummerierung
+
+\NewEnviron{strophe}[1][-1]{
+\def\gobble##1.{}%
+\ifnum#1=-1%
+%leer
+\else%
+\setcounter{GFM@strophen@counter}{#1}%
+\fi%
+\ifnum\ali=1%
+%%%Variante 1
+\tempB\parindent%
+\noindent\parbox{\textwidth}{\parindent \tempB\indent%
+\penalty1500%
+\spaceVorStrophe%
+\csuse{\GFM@strophen@Style}{GFM@strophen@counter}.~\stepcounter{GFM@strophen@counter}\BODY%
+\penalty1500%
+\spaceNachStrophe%
+}%
+\else%
+\penalty1500%
+\spaceVorStrophe%
+\csuse{\GFM@strophen@Style}{GFM@strophen@counter}.~\stepcounter{GFM@strophen@counter}\BODY%
+\penalty1500%
+\spaceNachStrophe%
+\fi%
+}%
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%Spacing
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\def\neueStrophe{\bigskip}
+
+
+
+%Head
+\def\setSpaceVorHeadValue#1{\def\spaceVorHeadValue{#1}}
+\def\setSpaceNachHeadValue#1{\def\spaceNachHeadValue{#1}}
+
+%Noten
+\def\setSpaceVorNotenValue#1{\def\spaceVorNotenValue{#1}}
+\def\setSpaceNachNotenValue#1{\def\spaceNachNotenValue{#1}}
+
+%Strophe
+\def\setSpaceVorStropheValue#1{\def\spaceVorStropheValue{#1}}
+\def\setSpaceNachStropheValue#1{\def\spaceNachStropheValue{#1}}
+
+%Notentext
+\def\setSpaceVorNotentextValue#1{\def\spaceVorNotentextValue{#1}}
+\def\setSpaceNachNotentextValue#1{\def\spaceNachNotentextValue{#1}}
+
+%Foot
+\def\setSpaceVorFootValue#1{\def\spaceVorFootValue{#1}}
+\def\setSpaceNachFootValue#1{\def\spaceNachFootValue{#1}}
+
+
+
+
+%%%horizontale Abstände
+\def\setSpaceStropheIndentValue#1{\def\spaceStropheIndentValue{#1}}
+\def\setSpaceHeadIndentValue#1{\def\spaceHeadIndentValue{#1}}
+\def\setSpaceFootIndentValue#1{\def\spaceFootIndentValue{#1}}
+
+%%%Standardwerte
+\setSpaceVorHeadValue{0pt plus 3pt}
+\setSpaceNachHeadValue{0pt plus 3pt}
+\setSpaceVorNotenValue{0pt plus 1pt}
+\setSpaceNachNotenValue{0pt plus 1pt}
+\setSpaceVorStropheValue{0pt plus 1pt}
+\setSpaceNachStropheValue{0pt plus 3pt}
+\setSpaceVorNotentextValue{0pt plus 1pt}
+\setSpaceNachNotentextValue{0pt plus 3pt}
+\setSpaceVorFootValue{0pt plus 3pt}
+\setSpaceNachFootValue{0pt plus 70pt}
+
+\setSpaceStropheIndentValue{0pt}
+\setSpaceHeadIndentValue{0pt}
+\setSpaceFootIndentValue{0pt}
+
+
+%%%Arrangieren der Spacewerte
+\def\spaceVorHead{\vskip\spaceVorHeadValue\noindent\mbox{}\hskip\spaceHeadIndentValue\mbox{}}
+
+\def\spaceNachHead{\relax\vskip\spaceNachHeadValue\relax}
+
+\def\spaceVorNoten{\relax\vskip\spaceVorNotenValue\relax}
+
+\def\spaceNachNoten{\relax\vskip\spaceNachNotenValue\relax}
+
+\def\spaceVorStrophe{\relax\vskip\spaceVorStropheValue\noindent\hskip\spaceStropheIndentValue\relax}
+
+\def\spaceNachStrophe{\relax\vskip\spaceNachStropheValue\relax}
+
+\def\spaceVorNotentext{\relax\vskip\spaceVorNotentextValue\relax}
+
+\def\spaceNachNotentext{\relax\vskip\spaceNachNotentextValue\relax}
+
+\def\spaceVorFoot{\relax\vskip\spaceVorFootValue \noindent \hskip\spaceFootIndentValue\relax}
+
+\def\spaceNachFoot{\relax\vskip\spaceNachFootValue\relax}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%Satzanpassung
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\def\forcePagebreakNachNotenzeile{}
+
+
+\def\forcePagebreakNachStrophe{}
+
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%Style-Anweisungen für Darstellung der Lieder.
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\newcommand{\LBHead}[1]{%
+\long\def\GFM@LB@Head{\spaceVorHead #1\relax\spaceNachHead}%
+}%
+
+
+\newcommand{\LBFoot}[1]{%
+\long\def\GFM@LB@Foot{\spaceVorFoot #1\relax\spaceNachFoot}%
+}%
+
+%%Hilfsfunktion
+%\long\def\printLayout#1#2#3#4{{%#1=Liederbuch #2=Liednummer #3=Liedvariante #4=Layout
+%	\NewDocumentCommand{\print}{O{\empty} m}{%
+%		\expandafter\ifx\csname GFM@LB@lied@#1@#3@#2@##2\endcsname\relax%
+%		\else%
+%			##1%
+%		\fi%
+%		\csname GFM@LB@lied@#1@#3@#2@##2\endcsname%
+%		\mbox{}%
+%	}%
+%	#4%
+%}}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%Umgebungen und Befehle für Liederbücher
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%Liederbuchumgebung
+%\newenvironment{Liederbuch}[1]
+%  {\def\liederbuchtmp{#1}}
+%  {}
+\NewEnviron{Liederbuch}[2][]{%
+\def\liederbuchtmp{#2}%
+%%Liedumgebung %csxdef
+\NewEnviron{Lied}[3][]{%
+\def\liederbuchtmpII{##2}%
+\def\liederbuchtmpIII{##3}%
+\unpackage{##1}%
+\unpackage{#1}%
+\global\cslet{liedBody;\liederbuchtmp;##2;##3}\BODY%
+}%
+\BODY% Ohne werden die Befehle nicht definiert. D.h. Der INhalt des kompletten Liederbuchs wird verworfen
+}
+
+
+%Forward auf Umgebung
+\newcommand{\LBsong}[3][\LBliederbuchStandard]{% #1=variation #2=songbook #3=number
+{%local
+\setlength{\parindent}{0pt}%
+\setlength{\parskip}{0pt}%
+%
+%
+%%%%%%%%%%%%%%Test
+%#1=Liederbuch #2=Liednummer #3=Liedvariante #4=Layout
+\NewDocumentCommand{\print}{O{\empty} m}{%
+	\expandafter\ifx\csname GFM@LB@lied@#2@#1@#3@##2\endcsname\relax%
+	\else%
+		##1%
+	\fi%
+	\csname GFM@LB@lied@#2@#1@#3@##2\endcsname%
+	\mbox{}%
+}%
+\GFM@LB@Head%
+%
+%%%%%%%%%%%%%%Testende
+%\printLayout{#2}{#3}{#1}{{\GFM@LB@Head}}%
+%
+%
+\csuse{liedBody;#2;#1;#3}%
+%
+%
+%%%%%%%%%%%%%%%Test
+\GFM@LB@Foot
+%%%%%%%%%%%%%%Testende
+%\printLayout{#2}{#3}{#1}{{\GFM@LB@Foot}}%
+%
+%
+}%local
+\penalty-3500%
+}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%Styles
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%\moderncvstyle{casual}
+%\moderncvcolor{blue}
+%
+%\def\GFMliederbuchStyle#1#2{%
+%%openStyle
+%
+%
+%
+%
+%%test if
+%}
+%
+%\GFM@LB@color#1#2{%
+%%if #1 = '0' => ifndef \farbzähler => def + \fz=0 : \fz=0 : \fz++
+%
+%}
+
+%number of colors used in a style. It has to match the number defined in the color scheme
+\newcount\GFM@LB@numberOfColors
+\GFM@LB@numberOfColors=3
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%Altlasten
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+

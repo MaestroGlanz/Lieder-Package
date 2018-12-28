@@ -1,0 +1,138 @@
+\ProvidesPackage{GFM-FillPages}
+\RequirePackage{xparse}
+\RequirePackage{GFM-RealPage}
+
+\newcount\GFM@FiPa@totalpages
+\newcount\GFM@FiPa@AnzahlAusgleichsSeiten
+\newcount\GFM@FiPa@AnzahlAusgleichspositionen
+\newcount\GFM@FiPa@AnzahlAusgleichspositionenIPP
+\newcount\GFM@FiPa@naechsteAusgleichsSeite
+\newcount\GFM@FiPa@Divisor
+\newcount\GFM@FiPa@DivideableOffset
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%Defines a custom fillpage 
+%
+%i.e. \setFillPage{1}{custom Text} lets appear "custom Text" on fillpage no. 1 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\long\def\setFillPage#1#2{
+\expandafter\global\expandafter\def\csname GFM@FiPa@AusgleichSeite#1\endcsname {
+\clearpage%
+#2
+\clearpage%
+}%\def\csname...
+}%\def\setFillPage
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%page count must be divideable by this certain number
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\NewDocumentCommand\pagesDividableBy{m O{0}}{
+\GFM@FiPa@Divisor=#1
+\GFM@FiPa@DivideableOffset=#2
+}
+
+%defaultValue
+\pagesDividableBy{4}
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%AtBeginDocument
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\AtBeginDocument{%
+%
+%
+\newif\ifcountAusgleich\relax%
+\countAusgleichfalse%
+\ifnum\GFM@FiPa@AnzahlAusgleichspositionen=0%
+\countAusgleichtrue%
+\fi%
+%
+\global\advance\GFM@FiPa@totalpages by-\GFM@FiPa@AnzahlAusgleichsSeiten%
+%
+\ifnum\GFM@FiPa@totalpages<0%
+\GFM@FiPa@totalpages=0%
+\fi%
+%
+\GFM@FiPa@AnzahlAusgleichsSeiten=0%
+%
+%%calculate number of missing pages for dividable by divisor
+\GFM@FiPa@AnzahlAusgleichsSeiten=\GFM@FiPa@totalpages%
+\loop%
+\advance\GFM@FiPa@AnzahlAusgleichsSeiten by -\GFM@FiPa@Divisor%
+\ifnum\GFM@FiPa@AnzahlAusgleichsSeiten>0\repeat%
+%
+\multiply\GFM@FiPa@AnzahlAusgleichsSeiten by -1%
+%
+%%take offset into account
+\advance\GFM@FiPa@AnzahlAusgleichsSeiten by \GFM@FiPa@DivideableOffset%
+%
+\ifnum\GFM@FiPa@AnzahlAusgleichsSeiten>-1% >=0
+\loop%
+\advance\GFM@FiPa@AnzahlAusgleichsSeiten by -\GFM@FiPa@Divisor%
+\ifnum\GFM@FiPa@AnzahlAusgleichsSeiten>-1\repeat % >=0%
+\fi%
+%
+\global\advance\GFM@FiPa@AnzahlAusgleichsSeiten by \GFM@FiPa@Divisor%
+%
+\wlog{Anzahl Ausgleichsseiten:\the\GFM@FiPa@AnzahlAusgleichsSeiten }%
+%
+}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%command insertFillPages
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%%call the desired page
+\def\GFM@FiPa@waehleAusgleichSeite#1{
+\expandafter\ifx\csname GFM@FiPa@AusgleichSeite#1\endcsname\relax
+\newpage
+%\noindent \parbox[t][0.98\textheight]{1\textwidth}{\mbox{}}
+\mbox{}
+\newpage
+\else
+\csname GFM@FiPa@AusgleichSeite#1\endcsname
+\fi
+}
+
+%%%%%%%central function begins here%%%%%%%
+%%insert the pages
+\newcommand{\insertFillPages}{
+	\advance\GFM@FiPa@AnzahlAusgleichspositionenIPP by1
+	\newif\ifcontinue\relax
+	\continuetrue
+	\ifcountAusgleich
+		\GFM@FiPa@AnzahlAusgleichsSeiten=0
+	\else
+		\newcount\GFM@FiPa@mylocal
+		\GFM@FiPa@mylocal=1
+		\multiply\GFM@FiPa@mylocal by\GFM@FiPa@AnzahlAusgleichspositionenIPP
+		\multiply\GFM@FiPa@mylocal by\GFM@FiPa@AnzahlAusgleichsSeiten
+		\divide\GFM@FiPa@mylocal by\GFM@FiPa@AnzahlAusgleichspositionen
+		\loop%required workaround
+		{\loop
+			\global\advance\GFM@FiPa@naechsteAusgleichsSeite by1
+			\GFM@FiPa@waehleAusgleichSeite{\the\GFM@FiPa@naechsteAusgleichsSeite} 
+		\ifnum\GFM@FiPa@naechsteAusgleichsSeite<\GFM@FiPa@mylocal\repeat}
+		\ifnum\GFM@FiPa@naechsteAusgleichsSeite<\GFM@FiPa@mylocal\repeat
+	\fi %ifcountAusgleich
+}
+%%%%%%%central function ends here%%%%%%%
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%AtEndDocument
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\AtEndDocument{%
+\advance\c@realpage by -1%
+\write\@auxout{\global\GFM@FiPa@totalpages= \arabic{realpage}}%
+\ifnum\GFM@FiPa@AnzahlAusgleichspositionenIPP=0%
+\GFM@FiPa@AnzahlAusgleichsSeiten=0%
+\fi%
+\write\@auxout{\global\GFM@FiPa@AnzahlAusgleichsSeiten= \the\GFM@FiPa@AnzahlAusgleichsSeiten}%
+\write\@auxout{\global\GFM@FiPa@AnzahlAusgleichspositionen= \the\GFM@FiPa@AnzahlAusgleichspositionenIPP}%
+%
+\wlog{Ausgleichspositionen: \the\GFM@FiPa@AnzahlAusgleichspositionen }%
+}
