@@ -12,21 +12,21 @@ ________
   
 \begin{Liederbuch}{testSongbook-1}[publisher=me & date = today]  
 \begin{Lied}[meta data=this is just a test & otherData = it really is a test]{var1}{144000}  
-   No notes and text yet.
-\end{Lied}
-\begin{Lied}{var2}{144000}
-   Same song, but different variant (var2)
-\end{Lied}
-\begin{Lied}{versionA}{001}
-   Another song with song number 001 in versionA. The version parameter exists, that song numbers can be overloaded.
-\end{Lied}
-\end{Liederbuch}
-
-\begin{Liederbuch}{testSongbook-2}
-\begin{Lied}[meta data= some other values]{aSong}{1}
-   Another song in another songbook
-\end{Lied}
-\end{Liederbuch}
+   No notes and text yet.  
+\end{Lied}  
+\begin{Lied}{var2}{144000}  
+   Same song, but different variant (var2)  
+\end{Lied}  
+\begin{Lied}{versionA}{001}  
+   Another song with song number 001 in versionA. The version parameter exists, that song numbers can be overloaded.  
+\end{Lied}  
+\end{Liederbuch}  
+  
+\begin{Liederbuch}{testSongbook-2}  
+\begin{Lied}[meta data= some other values]{aSong}{1}  
+   Another song in another songbook  
+\end{Lied}  
+\end{Liederbuch}  
 ________
 
 To call a song, you just write
