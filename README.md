@@ -7,11 +7,11 @@ The basic concept is to have one database, the Liederbuch (songbook) and a docum
 
 A songbook looks like that:
 ________
-\ProvidesPackage{testSongbook}
-\RequirePackage{GFM-Liederbuch}
-
-\begin{Liederbuch}{testSongbook-1}[publisher=me & date = today]
-\begin{Lied}[meta data=this is just a test & otherData = it really is a test]{var1}{144000}
+\ProvidesPackage{testSongbook}  
+\RequirePackage{GFM-Liederbuch}  
+  
+\begin{Liederbuch}{testSongbook-1}[publisher=me & date = today]  
+\begin{Lied}[meta data=this is just a test & otherData = it really is a test]{var1}{144000}  
    No notes and text yet.
 \end{Lied}
 \begin{Lied}{var2}{144000}
