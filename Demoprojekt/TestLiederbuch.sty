@@ -1,0 +1,133 @@
+\ProvidesPackage{TestLiederbuch}
+\RequirePackage{GFM-Liederbuch}
+\RequirePackage{GFM-RealPage}
+\RequirePackage{GFM-FillPages}
+
+\begin{Liederbuch}[%
+source = Test-Liederbuch &%
+year = 2017 &%
+titleOfLargerWork = Demoprojekt
+]{TestLiederbuch}
+
+
+\begin{Lied}[title=Hänschen klein & writer=Volkslied \& Überliefert & composer = Volkslied]{t}{1}
+\begin{strophe}[1]
+Hänschen klein,\\
+ging allein\\
+in die weite Welt hinein.\\
+Stock und Hut,\\
+steht im gut.\\
+Ist gar wohlgemut.\\
+Aber Mutter weinet sehr,\\
+hat ja nun kein Hänschen mehr.\\
+Da besinnt sich das Kind,\\
+kehret heim geschwind.
+\end{strophe}
+\begin{strophe}
+Hänschen klein,\\
+ging allein\\
+in’n Berliner Turnverein.\\
+Turnt am Reck,\\
+fällt in’n Dreck,\\
+ist die Nase weg.\\
+Kommt der Doktor Hampelmann,\\
+klebt die Nas’ mit Spucke an.\\
+Hänschen klein\\
+freut sich sehr,\\
+hat nun eine Nase mehr.\\
+\end{strophe}
+\end{Lied}
+
+\begin{Lied}[title=Hänschen klein & writer=Volkslied \& Überliefert & composer = Volkslied]{nt}{1}
+{%
+\notenzeile{\includegraphics[width=\linewidth,page=1]{./TestLiederbuchSnippets/haenschenKlein.pdf}}%
+{\nspace{5pt} Häns \ns* chen  \ns klein, \ns \ns ging \ns all \ns* ein \ns \ns in \ns die \ns wei \ns* te \nspace{4}}
+\notenzeile{\includegraphics[width=\linewidth,page=2]{./TestLiederbuchSnippets/haenschenKlein.pdf}}%
+{\nspace{12pt} Welt \ns hin \ns* ein. \ns \ns Stock \ns und \ns Hut \ns steht \ns ihm \ns gut, \nspace{5}}
+\notenzeile{\includegraphics[width=\linewidth,page=3]{./TestLiederbuchSnippets/haenschenKlein.pdf}}%
+{\nspace{6} ist \ns gar \ns wohl \ns* ge \ns* mut. \nspace{5} Ab \ns* er \ns Mut \ns* ter \nspace{3} }
+\notenzeile{\includegraphics[width=\linewidth,page=4]{./TestLiederbuchSnippets/haenschenKlein.pdf}}%
+{\nspace{4} wein \ns* et \ns sehr, \ns hat \ns ja \ns wohl \ns kein \ns Häns \ns* chen \ns mehr. \nspace{2} }
+\notenzeile{\includegraphics[width=\linewidth,page=5]{./TestLiederbuchSnippets/haenschenKlein.pdf}}%
+{\nspace{5} Da \ns be \ns* sinnt \ns \ns sich \ns das \ns Kind, \ns \ns kehr \ns* et \ns heim \ns ge \ns* schwind \nspace{2} }
+}
+\end{Lied}
+
+\begin{Lied}[title=Alle Vöglein sind schon da & composer =Kinderlied & quelle= Liederbuch & date = 1835 & writer = Kinderlied]{nt}{2}
+\begin{strophe}
+Alle Vöglein sind schon da,\\
+alle Vöglein alle.\\
+Amsel, Drossel, Fink und Star,\\
+und die ganze Vogelschar.\\
+Alle Vöglein sind schon da,\\
+alle Vöglein alle.\\
+\end{strophe}
+\end{Lied}
+
+\begin{Lied}{n}{336}
+song number 336, format n
+\end{Lied}
+
+\begin{Lied}[%
+title = Same but different &%
+writer = some tags are missing and therefore empty &%
+]{t}{3}
+Once again Song Number 1t as 3t via reference\vspace*{10pt}
+
+\csuse{liedBody;TestLiederbuch;t;1}
+\end{Lied}
+
+\begin{Lied}[%
+title = O alte Burschenherrlichkeit &%
+writer = Eugen Höfling (1808-1880) zugeschrieben &%
+composer = Studentenweise vor 1843 &%
+date = 18 Jhd.%
+]{nt}{80}
+\includegraphics[width=\linewidth,page=1]{./TestLiederbuchSnippets/CVLB80-OhAlteBurschenherrlichkeit.pdf}
+\notentext{\nspace{9} O \ns \ns \nspace{4pt} al \ns*[3pt] te \ns Bur \ns* schen \ns*[2] herr \ns* lich \ns*[-2] keit \ns wo-\nspace{3}}
+\includegraphics[width=\linewidth,page=2]{./TestLiederbuchSnippets/CVLB80-OhAlteBurschenherrlichkeit.pdf}
+\notentext{\nspace{5} hin \ns bist \ns du \ns verschwunden \ns \nspace{3} \ns nie \ns kehrst \ns du \ns wie \ns* der \nspace{2}}
+\includegraphics[width=\linewidth,page=3]{./TestLiederbuchSnippets/CVLB80-OhAlteBurschenherrlichkeit.pdf}
+\notentext{\nspace{4} gold' \ns* ne \ns Zeit \ns so \ns froh \ns und \ns un \ns* \ns ge \ns* \ns bun \ns* den \nspace{10}}
+\includegraphics[width=\linewidth,page=4]{./TestLiederbuchSnippets/CVLB80-OhAlteBurschenherrlichkeit.pdf}
+\notentext{\nspace{6}ver \ns* geb \ns* ens \ns spä \ns* he \ns \nspace{1} \ns ich \ns \nspace{1} \ns umher \ns ich \ns fin \ns* de \nspace{2}}
+\includegraphics[width=\linewidth,page=5]{./TestLiederbuchSnippets/CVLB80-OhAlteBurschenherrlichkeit.pdf}
+\notentext{\nspace{5} dei \ns* ne \ns \nspace{2} \ns Spur \ns \nspace{2} \ns nicht \ns \nspace{2} \ns mehr \ns \nspace{2} \ns O \ns je \ns* rum, \ns je \ns* rum, \nspace{1}}
+\includegraphics[width=\linewidth,page=6]{./TestLiederbuchSnippets/CVLB80-OhAlteBurschenherrlichkeit.pdf}
+\notentext{\nspace{6} je \ns* rum \ns \nspace{2} \ns O \ns quae \ns mu \ns* ta \ns* tio \ns re \ns* rum \nspace{7}}
+
+\begin{strophe}[2]
+Den Burschenhut bedeckt der Staub, es sank der Flaus in
+Trümmer, der Schläger ward des Rostes Raub, erblichen ist sein
+Schimmer, verklungen der Kommersgesang, verhallt Rapier- und
+Sporenklang. \whzl~O~jerum, jerum, jerum, o quae mutatio rerum!~\whzr 
+\end{strophe}
+\begin{strophe}
+Wo sind sie, die vom breiten Stein nicht wankten und nicht
+wichen, die ohne Moos bei Scherz und Wein den Herrn der Erde
+glichen? Sie zogen mit gesenktem Blick in das Philisterland
+zurück. \whzl~O~jerum, jerum, jerum, o quae mutatio rerum!~\whzr 
+\end{strophe}
+\begin{strophe}
+Da schreibt mit finsterm Amtsgesicht der eine Relationen, der
+andre seufzt beim Unterricht, und der macht Recensionen, der schilt die
+sündge Seele aus und der flickt ihr verfallnes Haus. \whzl~O~jerum, jerum, jerum, o quae mutatio rerum!~\whzr
+\end{strophe}
+\begin{strophe}
+Auf öder schraubt uns spannt das Fadenkreuz der ein, der andere seufzt beim Steinverband und der legt Pflastersteine; der kocht aus Rüben Zuckersaft und der aus Wasser Pferdekraft. \whzl~O~jerum, jerum, jerum, o quae mutatio rerum~\whzr\end{strophe}
+\begin{strophe}
+Allein das rechte Burschenherz kann nimmermehr erkalten; im
+Ernste wird, wie hier im Scherz, der rechte Sinn stets walten; die
+alte Schale nur ist fern, geblieben ist uns doch der Kern, \whzl~und den laßt
+fest uns halten!~\whzl 
+\end{strophe}
+\begin{strophe}
+Drum, Freunde! reichet euch die Hand, damit es sich erneue,
+der alten Freundschaft heilges Band, das alte Band der Treue. Klingt
+an und hebt die Gläser hoch, die alten Burschen leben noch, \whzl~noch lebt
+die alte Treue.~\whzr
+\end{strophe}
+
+\end{Lied}
+
+\end{Liederbuch}

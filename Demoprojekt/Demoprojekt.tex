@@ -1,0 +1,49 @@
+\documentclass[a5paper, 11pt]{scrartcl}
+\usepackage[ngerman]{babel}
+\usepackage[utf8]{inputenc}
+\usepackage{graphicx}
+\usepackage{lipsum}
+
+\usepackage{scrpage2}
+
+\usepackage{TestLiederbuch}
+%GFM-FillPages.sty must be in the same directory
+%GFM-RealPage.sty must be in the same directory
+
+
+\LBHead{%
+{\Large \textbf{\print{title}}}\hfill\mbox{}\vspace*{5pt}\\
+\makebox[32pt]{Musik:\hfill} \print{composer} \\\makebox[32pt]{Text:\hfill} \print{writer}\vspace*{3pt}
+
+}
+\LBFoot{Herausgabedatum: \print{date}\hfill\mbox{}}
+
+%% You can change these throughout the document however you like
+\setSpaceVorStropheValue{15pt plus 5pt}
+\setSpaceNachStropheValue{0pt plus 5pt}
+\setSpaceVorHeadValue{15pt plus 10pt minus 5pt}
+
+\begin{document}
+
+\LBsong[t]{TestLiederbuch}{1}
+
+\LBsong[nt]{TestLiederbuch}{1}
+
+\section{new section}
+\lipsum[1]
+\begin{center}
+\LBsong[nt]{TestLiederbuch}{2}
+\end{center}
+\lipsum[1]
+
+%% If you delete the '%', you can fix the meta data:
+%\tweakMetadata{t}{TestLiederbuch}{3}{source = Aschenbecher & title = Oh alte Wurstverkäuferherrlichkeit & composer = This doesn't make sense & unusedTag = we don't need that & writer = Now all tags are filled}
+
+\LBsong[t]{TestLiederbuch}{3}
+
+Text zum Testen \LBsong[nt]{TestLiederbuch}{80}
+
+\vskip 20pt
+The foot shouldn't be on this page. Right now it can't be fixed.
+
+\end{document}
